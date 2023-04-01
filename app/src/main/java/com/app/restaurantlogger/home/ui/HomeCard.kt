@@ -2,6 +2,7 @@ package com.app.restaurantlogger.home.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,7 +32,8 @@ import com.app.restaurantlogger.dataModel.sampleRestaurant
 fun HomeCard(
     modifier: Modifier = Modifier,
     index: Int = 0,
-    restaurant: Restaurant = sampleRestaurant
+    restaurant: Restaurant = sampleRestaurant,
+    onCardClick: () -> Unit = {}
 ) {
     val cardBackgroundColor = MaterialTheme.colorScheme.onPrimary
     val cardShape = MaterialTheme.shapes.large
@@ -52,6 +54,7 @@ fun HomeCard(
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(vertical = 8.dp, horizontal = 16.dp)
+            .clickable(onClick = onCardClick)
     ) {
         CardContent(restaurant = restaurant)
     }

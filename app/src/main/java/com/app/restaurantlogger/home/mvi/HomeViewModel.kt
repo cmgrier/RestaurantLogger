@@ -1,6 +1,8 @@
 package com.app.restaurantlogger.home.mvi
 
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.compose.rememberNavController
+import com.app.restaurantlogger.dataModel.Restaurant
 import com.app.restaurantlogger.mvi.BaseReducer
 import com.app.restaurantlogger.mvi.BaseViewModel
 import com.app.restaurantlogger.mvi.FetchStatus
