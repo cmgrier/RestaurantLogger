@@ -29,7 +29,12 @@ fun HomeScreen(
                 modifier = Modifier.padding(cardPadding),
                 index = index,
                 restaurant = item,
-                onCardClick = { navHostController.navigate(AppScreen.Log.title) }
+                onCardClick = {
+                    viewModel.resetScreen()
+                    navHostController.navigate(
+                        route = AppScreen.Log.title
+                    )
+                }
             )
         }
     }

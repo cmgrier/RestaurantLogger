@@ -28,7 +28,12 @@ val sampleRestaurant = Restaurant(
     sampleMealLogList
 )
 
-val sampleRestaurantList = listOf<Restaurant>(
+val sampleRestaurantList = listOf(
+    sampleRestaurant,
+    sampleRestaurant,
+    sampleRestaurant,
+    sampleRestaurant,
+    sampleRestaurant,
     sampleRestaurant,
     sampleRestaurant,
     sampleRestaurant

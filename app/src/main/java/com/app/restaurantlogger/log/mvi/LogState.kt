@@ -1,18 +1,18 @@
-package com.app.restaurantlogger.home.mvi
+package com.app.restaurantlogger.log.mvi
 
 import com.app.restaurantlogger.mvi.BaseState
 import com.app.restaurantlogger.mvi.FetchStatus
 import javax.annotation.concurrent.Immutable
 
 @Immutable
-data class HomeState(
+data class LogState(
     override val fetchStatus: FetchStatus,
-    val homeData: HomeData
-): BaseState {
+    val logData: LogData
+) : BaseState {
     companion object {
-        fun initial() = HomeState(
+        fun initial() = LogState(
             fetchStatus = FetchStatus.Fetching,
-            homeData = HomeData.intitial()
+            logData = LogData.initial()
         )
     }
 }
