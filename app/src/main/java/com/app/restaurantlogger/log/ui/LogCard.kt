@@ -6,38 +6,38 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.app.restaurantlogger.dataModel.MealLog
-import com.app.restaurantlogger.dataModel.sampleMealLog0
+import com.app.restaurantlogger.database.sampleReview0
+import com.app.restaurantlogger.database.Review
 import com.app.restaurantlogger.ui.reviewstars.StarRow
 
 @Composable
 fun LogCard(
     modifier: Modifier = Modifier,
-    mealLog: MealLog = sampleMealLog0
+    review: Review = sampleReview0,
 ) {
     Box(
         modifier = modifier
     ) {
         CardContent(
-            mealLog = mealLog
+            review = review,
         )
     }
 }
 
 @Composable
 private fun CardContent(
-    mealLog: MealLog
+    review: Review
 ) {
     Column {
         // Rating
-        StarRow(starCount = mealLog.rating)
+        review.rating?.let { StarRow(starCount = it) }
 
         // Headline
         val headlineTextStyle = MaterialTheme.typography.headlineMedium
         val headlineTextColor = MaterialTheme.colorScheme.onPrimaryContainer
 
         Text(
-            text = mealLog.headline,
+            text = review.headline,
             color = headlineTextColor,
             style = headlineTextStyle
         )
