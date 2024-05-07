@@ -6,11 +6,13 @@ import com.app.restaurantlogger.mvi.BaseData
 
 data class LogData(
     override val name: String = "Log Data",
-    val restaurant: Restaurant
+    val restaurant: Restaurant?,
+    val placeId: Int?,
 ): BaseData {
     companion object {
         fun initial() = LogData(
-            restaurant = sampleRestaurant
+            restaurant = null,
+            placeId = null,
         )
     }
 }

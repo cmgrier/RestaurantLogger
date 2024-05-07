@@ -1,31 +1,55 @@
 package com.app.restaurantlogger.dataModel
 
+import com.app.restaurantlogger.database.Place
+import com.app.restaurantlogger.database.Review
+import com.app.restaurantlogger.database.SimplePlace
+import com.app.restaurantlogger.database.samplePlace0
+import com.app.restaurantlogger.database.sampleReviewList
+
 data class Restaurant(
-    val title: String,
-    val cuisine: Cuisine,
-    val logs: List<MealLog>
+    val place: Place,
+    val reviews: List<Review>,
 ) {
-    fun averageRating(): Float {
-        var rating = 0f
-        return if (logs.isNotEmpty()) {
-            logs.forEach {
-                rating += it.rating
+    fun averageRating(): Float? {
+        var ratingSum = 0f
+        var totalRatings = 0
+        return if (reviews.isNotEmpty()) {
+            reviews.forEach {
+                it.rating?.let { rating ->
+                    totalRatings += 1
+                    ratingSum += rating
+                }
             }
-            rating / logs.count()
+            ratingSum / totalRatings
         } else {
-            rating
+            null
         }
     }
 }
 
 enum class Cuisine {
-    Italian, Mexican, Greek, Indian, American, FastFood, Fusion
+    Italian,
+    Mexican,
+    Greek,
+    Indian,
+    American,
+    Fast,
+    Fusion,
+    Other,
+}
+
+fun String.toCuisine(): Cuisine {
+    Cuisine.entries.forEach {
+        if (it.name == this) {
+            return it
+        }
+    }
+    return Cuisine.Other
 }
 
 val sampleRestaurant = Restaurant(
-    "Mama's Meatballs",
-    Cuisine.Italian,
-    sampleMealLogList
+    place = samplePlace0,
+    reviews = sampleReviewList,
 )
 
 val sampleRestaurantList = listOf(

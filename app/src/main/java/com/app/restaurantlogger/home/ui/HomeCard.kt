@@ -17,10 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.app.restaurantlogger.dataModel.MealLog
 import com.app.restaurantlogger.dataModel.Restaurant
-import com.app.restaurantlogger.dataModel.sampleMealLog0
+import com.app.restaurantlogger.database.sampleReview0
 import com.app.restaurantlogger.dataModel.sampleRestaurant
+import com.app.restaurantlogger.database.Review
 import com.app.restaurantlogger.ui.reviewstars.StarRow
 
 @Preview
@@ -67,9 +67,9 @@ private fun CardContent(
         val titleTextColor = MaterialTheme.colorScheme.onPrimaryContainer
 
         Text(
-            text = restaurant.title,
+            text = restaurant.place.name,
             style = titleTextStyle,
-            color = titleTextColor
+            color = titleTextColor,
         )
 
         // Cuisine and Rating
@@ -80,27 +80,29 @@ private fun CardContent(
         Row(
             verticalAlignment = Alignment.Bottom
         ) {
-            Text(
-                text = restaurant.cuisine.name,
-                style = cuisineTextStyle,
-                color = cuisineTextColor,
-                fontStyle = FontStyle.Italic,
-                modifier = Modifier.padding(end = cuisineEndPadding)
-            )
-            StarRow(starCount = restaurant.averageRating())
+            restaurant.place.cuisine?.let {
+                Text(
+                    text = it,
+                    style = cuisineTextStyle,
+                    color = cuisineTextColor,
+                    fontStyle = FontStyle.Italic,
+                    modifier = Modifier.padding(end = cuisineEndPadding)
+                )
+            }
+            restaurant.averageRating()?.let { StarRow(starCount = it) }
         }
 
-        // Recent Log
-        if (restaurant.logs.isNotEmpty()) {
-            RecentMealLog(Modifier.padding(top = 8.dp), restaurant.logs[0])
+        // Recent Review
+        if (restaurant.reviews.isNotEmpty()) {
+            RecentReview(Modifier.padding(top = 8.dp), restaurant.reviews[0])
         }
     }
 }
 
 @Composable
-private fun RecentMealLog(
+private fun RecentReview(
     modifier: Modifier = Modifier,
-    log: MealLog = sampleMealLog0
+    review: Review = sampleReview0,
 ) {
     val recentLogTitleTextStyle = MaterialTheme.typography.bodyMedium
     val recentLogTitleTextColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -109,15 +111,17 @@ private fun RecentMealLog(
 
     Column(modifier = modifier) {
         Text(
-            text = log.headline,
+            text = review.headline,
             style = recentLogTitleTextStyle,
             color = recentLogTitleTextColor
         )
-        Text(
-            text = log.details,
-            style = recentLogDetailsTextStyle,
-            color = recentLogDetailsTextColor,
-            maxLines = 2
-        )
+        review.details?.let {
+            Text(
+                text = it,
+                style = recentLogDetailsTextStyle,
+                color = recentLogDetailsTextColor,
+                maxLines = 2
+            )
+        }
     }
 }
