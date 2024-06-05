@@ -5,6 +5,8 @@ import com.app.restaurantlogger.database.Review
 import com.app.restaurantlogger.database.SimplePlace
 import com.app.restaurantlogger.database.samplePlace0
 import com.app.restaurantlogger.database.sampleReviewList
+import com.app.restaurantlogger.home.ui.Filters
+import com.app.restaurantlogger.home.ui.SortMethod
 
 data class Restaurant(
     val place: Place,
@@ -27,6 +29,20 @@ data class Restaurant(
     }
 }
 
+fun List<Restaurant>.sort(sortMethod: SortMethod): List<Restaurant> = when(sortMethod) {
+    SortMethod.Rating -> this.sortedByDescending { it.averageRating() }
+    SortMethod.Name -> this.sortedByDescending { it.place.name }
+}
+
+fun List<Restaurant>.filter(filters: Filters): List<Restaurant> = this.filter { restaurant ->
+    val isValidRating = restaurant.averageRating()?.let { averageRating ->
+        averageRating < filters.ratingUpperLimit && averageRating > filters.ratingLowerLimit
+    } ?: true
+    val isValidCuisine = filters.cuisine?.let { cuisine -> restaurant.place.cuisine == cuisine.name } ?: true
+    val isValidReviewed = filters.reviewed?.let { reviewFilter -> restaurant.reviews.isNotEmpty() == reviewFilter } ?: true
+    isValidCuisine && isValidRating && isValidReviewed
+}
+
 enum class Cuisine {
     Italian,
     Mexican,
@@ -35,6 +51,7 @@ enum class Cuisine {
     American,
     Fast,
     Fusion,
+    Breakfast,
     Other,
 }
 

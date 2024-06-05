@@ -12,7 +12,7 @@ data class HomeState(
     companion object {
         fun initial() = HomeState(
             fetchStatus = FetchStatus.Fetching,
-            homeData = HomeData.intitial()
+            homeData = HomeData.initial()
         )
     }
 }

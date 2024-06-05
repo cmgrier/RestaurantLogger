@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -16,8 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -28,12 +25,13 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.app.restaurantlogger.AppScreen
 import com.app.restaurantlogger.R
-import com.app.restaurantlogger.log.ui.AddReviewItem
+import com.app.restaurantlogger.log.ui.NoReviewsItem
 import com.app.restaurantlogger.log.ui.AddReviewSheet
 import com.app.restaurantlogger.log.ui.LogCard
 import com.app.restaurantlogger.ui.enterZoomLeft
 import com.app.restaurantlogger.ui.exitZoomLeft
 import com.app.restaurantlogger.ui.exitZoomRight
+import com.app.restaurantlogger.ui.theme.LocalEdgePadding
 import com.google.accompanist.navigation.animation.composable
 
 private const val PLACE_ID = "placeId"
@@ -98,37 +96,36 @@ fun LogScreen(
             )
         }
 
-        val showSheet = remember {
-            mutableStateOf(false)
-        }
-
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = LocalEdgePadding.current),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            val items = restaurant?.reviews.orEmpty()
             itemsIndexed(
-                items = restaurant?.reviews.orEmpty()
+                items = items
             ) {index, item ->
                 LogCard(review = item)
             }
-            item {
-                AddReviewItem(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .clickable {
-                            showSheet.value = true
-                        }
-                )
+            if (items.isEmpty()) {
+                item {
+                    NoReviewsItem(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .clickable {
+                                viewModel.showSheet()
+                            }
+                    )
+                }
             }
         }
 
         AddReviewSheet(
             modifier = Modifier,
-            showSheet = showSheet.value,
-            onDismissRequest = { showSheet.value = false },
+            showSheet = state.showNewLogSheet,
+            onDismissRequest = { viewModel.hideSheet() },
             onSubmitRequest = {
                 viewModel.addReview(it)
-                showSheet.value = false
+                viewModel.hideSheet()
             }
         )
     }

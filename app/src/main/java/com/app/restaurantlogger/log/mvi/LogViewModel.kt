@@ -1,6 +1,12 @@
 package com.app.restaurantlogger.log.mvi
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.app.restaurantlogger.AppScreen
 import com.app.restaurantlogger.database.AppDatabase
@@ -8,10 +14,10 @@ import com.app.restaurantlogger.database.DataReview
 import com.app.restaurantlogger.database.Review
 import com.app.restaurantlogger.database.SimpleReview
 import com.app.restaurantlogger.database.toRestaurant
-import com.app.restaurantlogger.home.mvi.HomeViewModel
 import com.app.restaurantlogger.mvi.BaseReducer
 import com.app.restaurantlogger.mvi.BaseViewModel
 import com.app.restaurantlogger.mvi.FetchStatus
+import com.app.restaurantlogger.ui.FloatingActionButtonContent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -31,10 +37,14 @@ class LogViewModel @Inject constructor(
         get() = reducer.state
 
     override val floatingActionButtonAction: () -> Unit
-        get() = {}
+        get() = {
+            showSheet()
+        }
 
     override val floatingActionButton: @Composable () -> Unit
-        get() = {}
+        get() = {
+            FloatingActionButtonContent("+ Add Review")
+        }
     override val topBar: @Composable () -> Unit
         get() = {}
 
@@ -97,6 +107,14 @@ class LogViewModel @Inject constructor(
         }
     }
 
+    fun showSheet() {
+        sendEvent(LogIntent.ShowNewLogSheet)
+    }
+
+    fun hideSheet() {
+        sendEvent(LogIntent.HideNewLogSheet)
+    }
+
     private fun sendEvent(event: LogIntent) {
         reducer.sendEvent(event)
     }
@@ -117,6 +135,12 @@ class LogViewModel @Inject constructor(
                 }
                 is LogIntent.UpdateData -> {
                     setState(oldState.copy(fetchStatus = FetchStatus.Fetched, logData = event.data))
+                }
+                is LogIntent.ShowNewLogSheet -> {
+                    setState(oldState.copy(showNewLogSheet = true))
+                }
+                is LogIntent.HideNewLogSheet -> {
+                    setState(oldState.copy(showNewLogSheet = false))
                 }
             }
         }

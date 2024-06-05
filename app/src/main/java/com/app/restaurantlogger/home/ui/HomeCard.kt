@@ -1,5 +1,9 @@
 package com.app.restaurantlogger.home.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,16 +16,24 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.restaurantlogger.dataModel.Restaurant
 import com.app.restaurantlogger.database.sampleReview0
 import com.app.restaurantlogger.dataModel.sampleRestaurant
 import com.app.restaurantlogger.database.Review
+import com.app.restaurantlogger.database.sampleReviewList
 import com.app.restaurantlogger.ui.reviewstars.StarRow
+import com.app.restaurantlogger.ui.reviewstars.StarSize
+import kotlinx.coroutines.delay
 
 @Preview
 @Composable
@@ -31,13 +43,14 @@ fun HomeCard(
     restaurant: Restaurant = sampleRestaurant,
     onCardClick: () -> Unit = {}
 ) {
-    val cardBackgroundColor = MaterialTheme.colorScheme.onPrimary
+    val cardBackgroundColor = MaterialTheme.colorScheme.primaryContainer
     val cardShape = MaterialTheme.shapes.large
-    val cardBorderStroke = 4.dp
+    val cardBorderStroke = 2.dp
     val cardBorderColor = MaterialTheme.colorScheme.primary
 
     Box(
         modifier = modifier
+            .clickable(onClick = onCardClick)
             .background(
                 color = cardBackgroundColor,
                 shape = cardShape
@@ -50,7 +63,6 @@ fun HomeCard(
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(vertical = 8.dp, horizontal = 16.dp)
-            .clickable(onClick = onCardClick)
     ) {
         CardContent(restaurant = restaurant)
     }
@@ -74,7 +86,7 @@ private fun CardContent(
 
         // Cuisine and Rating
         val cuisineTextStyle = MaterialTheme.typography.bodyLarge
-        val cuisineTextColor = MaterialTheme.colorScheme.onSecondaryContainer
+        val cuisineTextColor = MaterialTheme.colorScheme.secondary
         val cuisineEndPadding = 8.dp
 
         Row(
@@ -92,36 +104,89 @@ private fun CardContent(
             restaurant.averageRating()?.let { StarRow(starCount = it) }
         }
 
-        // Recent Review
+        // Reviews
         if (restaurant.reviews.isNotEmpty()) {
-            RecentReview(Modifier.padding(top = 8.dp), restaurant.reviews[0])
+            Review(Modifier.padding(top = 8.dp), restaurant.reviews)
         }
     }
 }
 
 @Composable
-private fun RecentReview(
+private fun getCurrentReview(reviews: List<Review>): Review {
+
+    val currentIndex = remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            currentIndex.intValue = (currentIndex.intValue + 1) % reviews.size
+            delay(5000)
+        }
+    }
+
+    return reviews[currentIndex.intValue]
+}
+
+@Composable
+private fun Review(
     modifier: Modifier = Modifier,
-    review: Review = sampleReview0,
+    reviews: List<Review> = sampleReviewList,
 ) {
     val recentLogTitleTextStyle = MaterialTheme.typography.bodyMedium
     val recentLogTitleTextColor = MaterialTheme.colorScheme.onPrimaryContainer
     val recentLogDetailsTextStyle = MaterialTheme.typography.bodySmall
     val recentLogDetailsTextColor = MaterialTheme.colorScheme.secondary
 
-    Column(modifier = modifier) {
-        Text(
-            text = review.headline,
-            style = recentLogTitleTextStyle,
-            color = recentLogTitleTextColor
-        )
-        review.details?.let {
-            Text(
-                text = it,
-                style = recentLogDetailsTextStyle,
-                color = recentLogDetailsTextColor,
-                maxLines = 2
-            )
+    val review = getCurrentReview(reviews = reviews)
+
+    val composableReview = remember {
+        mutableStateOf(sampleReview0)
+    }
+
+    val contentAlpha = remember {
+        mutableStateOf(true)
+    }
+
+    val fadeDuration = 300
+
+    LaunchedEffect(
+        key1 = review,
+    ) {
+        if (composableReview.value == sampleReview0) {
+            composableReview.value = review
+        } else {
+            contentAlpha.value = false
+            delay(fadeDuration.toLong())
+            composableReview.value = review
+            contentAlpha.value = true
+        }
+    }
+    
+    AnimatedVisibility(
+        visible = contentAlpha.value,
+        enter = fadeIn(animationSpec = tween(durationMillis = fadeDuration)),
+        exit = fadeOut(animationSpec = tween(durationMillis = fadeDuration)),
+    ) {
+        Column(modifier = modifier) {
+            Row {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = composableReview.value.headline,
+                    style = recentLogTitleTextStyle,
+                    color = recentLogTitleTextColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                composableReview.value.rating?.let { StarRow(starCount = it, starSize = StarSize.Small) }
+            }
+            composableReview.value.details?.let {
+                Text(
+                    text = it,
+                    style = recentLogDetailsTextStyle,
+                    color = recentLogDetailsTextColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

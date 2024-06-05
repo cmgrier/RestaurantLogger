@@ -15,7 +15,7 @@ data class Review(
     @ColumnInfo(name = "rating") override val rating: Float?,
     @ColumnInfo(name = "headline") override val headline: String,
     @ColumnInfo(name = "details") override val details: String?,
-): SimpleReview
+) : SimpleReview
 
 interface SimpleReview {
     val placeId: Int
@@ -29,7 +29,21 @@ data class DataReview(
     override val headline: String,
     override val details: String?,
     override val rating: Float?,
-): SimpleReview
+) : SimpleReview
+
+fun nearestHalfRating(rating: Float): Float {
+    val remainder = if (rating > 1f) rating % rating.toInt() else rating
+    return rating.toInt() +
+        if (remainder > 0.25f) {
+            if (remainder > .75f) {
+                1f
+            } else {
+                .5f
+            }
+        } else {
+            0f
+        }
+}
 
 @Dao
 interface ReviewDao {
@@ -49,32 +63,36 @@ interface ReviewDao {
     fun delete(review: Review)
 }
 
-val sampleReview0 = Review(
-    uid = 0,
-    placeId = 0,
-    rating = 3.5f,
-    headline = "Best Meatball's in town!",
-    details = "The chicken parm was a soggy, but the meatballs were so good and fresh!",
-)
+val sampleReview0 =
+    Review(
+        uid = 0,
+        placeId = 0,
+        rating = 3.5f,
+        headline = "Best Meatball's in town!",
+        details = "The chicken parm was a soggy, but the meatballs were so good and fresh!",
+    )
 
-val sampleReview1 = Review(
-    uid = 0,
-    placeId = 0,
-    rating = 2.0f,
-    headline = "Server was rude",
-    details = "Took forever to get seated and we barely saw our server. Food was cold when we got it",
-)
+val sampleReview1 =
+    Review(
+        uid = 0,
+        placeId = 0,
+        rating = 2.0f,
+        headline = "Server was rude",
+        details = "Took forever to get seated and we barely saw our server. Food was cold when we got it",
+    )
 
-val sampleReview2 = Review(
-    uid = 0,
-    placeId = 0,
-    rating = 5.0f,
-    headline = "Mashed Potatoes to die for",
-    details = "perfect roast chicken dinner with the best mashed potatoes ever. Also great cocktails!",
-)
+val sampleReview2 =
+    Review(
+        uid = 0,
+        placeId = 0,
+        rating = 5.0f,
+        headline = "Mashed Potatoes to die for",
+        details = "perfect roast chicken dinner with the best mashed potatoes ever. Also great cocktails!",
+    )
 
-val sampleReviewList = listOf(
-    sampleReview0,
-    sampleReview1,
-    sampleReview2
-)
+val sampleReviewList =
+    listOf(
+        sampleReview0,
+        sampleReview1,
+        sampleReview2,
+    )

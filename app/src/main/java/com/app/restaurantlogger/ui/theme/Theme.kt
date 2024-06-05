@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 
 private val DarkColorPalette = darkColorScheme()
 
@@ -20,11 +21,15 @@ fun RestaurantLoggerTheme(
     } else {
         LightColorPalette
     }
-
-    MaterialTheme(
-        colorScheme = colors,
-        typography = MaterialTheme.typography,
-        shapes = MaterialTheme.shapes,
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalEdgePadding provides defaultEdgeSpacing,
+        LocalSheetBottomPadding provides defaultSheetBottomSpacing,
+    ) {
+        MaterialTheme(
+            colorScheme = colors,
+            typography = MaterialTheme.typography,
+            shapes = MaterialTheme.shapes,
+            content = content
+        )
+    }
 }

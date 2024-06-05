@@ -8,30 +8,51 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.app.restaurantlogger.R
+
+enum class StarSize(val size: Dp) {
+    Small(16.dp),
+    Medium(24.dp),
+    Large(48.dp),
+    XLarge(72.dp),
+}
 
 @Composable
 fun StarRow(
     modifier: Modifier = Modifier,
-    starCount: Float
+    starCount: Float,
+    starSize: StarSize = StarSize.Medium,
 ) {
     val starIconFull = painterResource(id = R.drawable.round_star_24)
     val starIconHalf = painterResource(id = R.drawable.round_star_half_24)
     val starIconEmpty = painterResource(id = R.drawable.round_star_border_24)
 
-    val filledStars = starCount.toInt()
+    val filledStars = starCount.toInt() + if (starCount.mod(1f) > .75f) 1 else 0
     Row(modifier = modifier) {
         repeat(filledStars) {
-            StarIcon(painter = starIconFull, contentDescription = "full review star")
+            StarIcon(
+                painter = starIconFull,
+                contentDescription = "full review star",
+                starSize = starSize,
+            )
         }
-        val hasHalfStar = starCount - filledStars > 0
+        val hasHalfStar = starCount - filledStars.toFloat() > 0.25f
         if (hasHalfStar) {
-            StarIcon(painter = starIconHalf, contentDescription = "half review star")
+            StarIcon(
+                painter = starIconHalf,
+                contentDescription = "half review star",
+                starSize = starSize,
+            )
         }
         val emptyStars = 5 - filledStars - if (hasHalfStar) 1 else 0
         repeat(emptyStars) {
-            StarIcon(painter = starIconEmpty, contentDescription = "empty review star")
+            StarIcon(
+                painter = starIconEmpty,
+                contentDescription = "empty review star",
+                starSize = starSize,
+            )
         }
     }
 }
@@ -40,7 +61,8 @@ fun StarRow(
 private fun StarIcon(
     painter: Painter,
     contentDescription: String,
-    modifier: Modifier = Modifier
+    starSize: StarSize,
+    modifier: Modifier = Modifier,
 ) {
     val starColor = MaterialTheme.colorScheme.primary
 
@@ -48,6 +70,6 @@ private fun StarIcon(
         painter = painter,
         contentDescription = contentDescription,
         tint = starColor,
-        modifier = modifier.size(22.dp)
+        modifier = modifier.size(starSize.size),
     )
 }

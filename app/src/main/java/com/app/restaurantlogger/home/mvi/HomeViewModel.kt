@@ -1,7 +1,5 @@
 package com.app.restaurantlogger.home.mvi
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewModelScope
 import com.app.restaurantlogger.AppScreen
@@ -9,10 +7,13 @@ import com.app.restaurantlogger.dataModel.Restaurant
 import com.app.restaurantlogger.database.AppDatabase
 import com.app.restaurantlogger.database.Place
 import com.app.restaurantlogger.database.SimplePlace
-import com.app.restaurantlogger.log.mvi.LogViewModel
+import com.app.restaurantlogger.database.toRestaurant
+import com.app.restaurantlogger.home.ui.Filters
+import com.app.restaurantlogger.home.ui.SortMethod
 import com.app.restaurantlogger.mvi.BaseReducer
 import com.app.restaurantlogger.mvi.BaseViewModel
 import com.app.restaurantlogger.mvi.FetchStatus
+import com.app.restaurantlogger.ui.FloatingActionButtonContent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -32,13 +33,10 @@ class HomeViewModel @Inject constructor(
         get() = reducer.state
 
     override val floatingActionButtonAction: () -> Unit
-        get() = { showSheet() }
+        get() = { showAddPlaceSheet() }
     override val floatingActionButton: @Composable () -> Unit
         get() = {
-            Text(
-                text = "+ Add Place",
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            FloatingActionButtonContent(title = "+ Add Place")
         }
     override val topBar: @Composable () -> Unit
         get() = {}
@@ -69,12 +67,60 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun showSheet() {
-        sendEvent(HomeIntent.UpdateData(data = state.value.homeData.copy(showSheet = true)))
+    fun showAddPlaceSheet() {
+        sendEvent(HomeIntent.UpdateData(data = state.value.homeData.copy(showAddPlaceSheet = true)))
     }
 
-    fun hideSheet() {
-        sendEvent(HomeIntent.UpdateData(data = state.value.homeData.copy(showSheet = false)))
+    fun hideAddPlaceSheet() {
+        sendEvent(
+            HomeIntent.UpdateData(
+                data = state.value.homeData.copy(
+                    showAddPlaceSheet = false,
+                )
+            )
+        )
+    }
+
+    fun changeSort(sortMethod: SortMethod) {
+        sendEvent(HomeIntent.UpdateData(data = state.value.homeData.copy(sortMethod = sortMethod)))
+    }
+
+    fun showSortSheet() {
+        sendEvent(HomeIntent.UpdateData(data = state.value.homeData.copy(showSortSheet = true)))
+    }
+
+    fun hideSortSheet() {
+        sendEvent(
+            HomeIntent.UpdateData(
+                data = state.value.homeData.copy(
+                    showSortSheet = false,
+                )
+            )
+        )
+    }
+
+    fun changeFilters(newFilters: Filters) {
+        sendEvent(HomeIntent.UpdateData(data = state.value.homeData.copy(selectedFilters = newFilters)))
+    }
+
+    fun showFilterSheet() {
+        sendEvent(
+            HomeIntent.UpdateData(
+                data = state.value.homeData.copy(
+                    showFilterSheet = true,
+                )
+            )
+        )
+    }
+
+    fun hideFilterSheet() {
+        sendEvent(
+            HomeIntent.UpdateData(
+                data = state.value.homeData.copy(
+                    showFilterSheet = false,
+                )
+            )
+        )
     }
 
     private fun sendEvent(event: HomeIntent) {
@@ -84,12 +130,32 @@ class HomeViewModel @Inject constructor(
     private fun resetScreen() {
         thread {
             sendEvent(HomeIntent.LoadingData)
-            val restaurants = getAllRestaurants()
-            sendEvent(HomeIntent.UpdateData(data = HomeData(places = restaurants, showSheet = false)))
+            val places = getAllPlaces()
+            sendEvent(
+                HomeIntent.UpdateData(
+                    data = HomeData.initial().copy(
+                        restaurants = places.map { it.toRestaurant() },
+                        sortMethod = state.value.homeData.sortMethod,
+                    )
+                )
+            )
         }
     }
 
-    private fun getAllRestaurants(): List<Place> = appDatabase.placeDao().getAll()
+    private fun getAllPlaces(): List<Place> = appDatabase.placeDao().getAll()
+
+    fun populateReviews(place: Place) {
+        thread {
+            sendEvent(HomeIntent.LoadingData)
+            val reviews = appDatabase.reviewDao().findByPlace(placeId = place.uid)
+            val newRestaurants = state.value.homeData.restaurants.map {
+                if (it.place.uid == place.uid) {
+                    place.toRestaurant(reviews = reviews)
+                } else it
+            }
+            sendEvent(HomeIntent.UpdateData(data = state.value.homeData.copy(restaurants = newRestaurants)))
+        }
+    }
 
     class HomeReducer(initialState: HomeState): BaseReducer<HomeState, HomeIntent>(initialState) {
         override fun reduce(oldState: HomeState, event: HomeIntent) {

@@ -7,18 +7,22 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.app.restaurantlogger.database.DataReview
 import com.app.restaurantlogger.database.SimpleReview
+import com.app.restaurantlogger.database.nearestHalfRating
+import com.app.restaurantlogger.home.ui.StyledTextField
+import com.app.restaurantlogger.ui.theme.LocalEdgePadding
+import com.app.restaurantlogger.ui.theme.LocalSheetBottomPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,59 +33,58 @@ fun AddReviewSheet(
     onSubmitRequest: (SimpleReview) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
-    val headline = remember {
+    var headline by remember {
         mutableStateOf("")
     }
-    val details = remember {
+    var details by remember {
         mutableStateOf<String?>(null)
     }
-    val rating = remember {
+    var rating by remember {
         mutableStateOf<Float?>(null)
     }
-    val review = DataReview(placeId = -1, rating = rating.value, headline = headline.value, details = details.value)
+
+    val starRating = nearestHalfRating(rating ?: 0f)
+    val review = DataReview(placeId = -1, rating = rating, headline = headline, details = details)
 
     if (showSheet) {
         ModalBottomSheet(
             modifier = modifier,
             sheetState = sheetState,
-            onDismissRequest = onDismissRequest
+            onDismissRequest = onDismissRequest,
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 32.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = LocalEdgePadding.current)
+                        .padding(bottom = LocalSheetBottomPadding.current),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                TextField(
-                    value = headline.value,
-                    placeholder = {
-                        Text(text = "Headline")
-                    },
+                StyledTextField(
+                    value = headline,
+                    placeholder = "Headline",
                     onValueChange = {
-                        headline.value = it
+                        headline = it
                     },
                 )
 
-                TextField(
-                    value = details.value.orEmpty(),
-                    placeholder = {
-                        Text(text = "Details")
-                    },
+                StyledTextField(
+                    value = details.orEmpty(),
+                    placeholder = "Details",
                     onValueChange = {
-                        details.value = it
+                        details = it
                     },
                 )
 
-                Slider(
-                    value = rating.value ?: 0f,
-                    onValueChange = { rating.value = it },
-                    valueRange = 0f..5f,
+                RatingSelector(
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    rating = rating ?: 0f,
+                    onValueChange = { rating = nearestHalfRating(it) },
                 )
 
                 Button(
                     enabled = review.isValid(),
-                    onClick = { onSubmitRequest(review) }
+                    onClick = { onSubmitRequest(review) },
                 ) {
                     Text(
                         text = "Submit",
@@ -91,10 +94,6 @@ fun AddReviewSheet(
             }
         }
     }
-}
-
-@Composable
-private fun RatingRow(modifier: Modifier) {
 }
 
 private fun SimpleReview.isValid(): Boolean = this.headline.isNotEmpty()
