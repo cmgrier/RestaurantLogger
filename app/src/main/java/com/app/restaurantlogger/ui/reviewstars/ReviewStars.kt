@@ -8,22 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.app.restaurantlogger.R
-
-enum class StarSize(val size: Dp) {
-    Small(16.dp),
-    Medium(24.dp),
-    Large(48.dp),
-    XLarge(72.dp),
-}
+import com.app.restaurantlogger.util.IconSize
 
 @Composable
 fun StarRow(
     modifier: Modifier = Modifier,
     starCount: Float,
-    starSize: StarSize = StarSize.Medium,
+    starSize: IconSize = IconSize.Medium,
 ) {
     val starIconFull = painterResource(id = R.drawable.round_star_24)
     val starIconHalf = painterResource(id = R.drawable.round_star_half_24)
@@ -61,7 +53,7 @@ fun StarRow(
 private fun StarIcon(
     painter: Painter,
     contentDescription: String,
-    starSize: StarSize,
+    starSize: IconSize,
     modifier: Modifier = Modifier,
 ) {
     val starColor = MaterialTheme.colorScheme.primary

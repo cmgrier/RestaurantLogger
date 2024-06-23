@@ -7,17 +7,18 @@ import androidx.room.RoomDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
-import dagger.hilt.android.internal.managers.ApplicationComponentManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import kotlin.random.Random
-import kotlin.random.nextUInt
 
-@Database(entities = [Review::class, Place::class], version = 1, exportSchema = false)
+@Database(
+    entities = [Review::class, Place::class],
+    version = 1,
+    exportSchema = false,
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun reviewDao(): ReviewDao
+
     abstract fun placeDao(): PlaceDao
 }
 
@@ -26,7 +27,9 @@ abstract class AppDatabase : RoomDatabase() {
 object AppDatabaseModule {
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+    fun provideAppDatabase(
+        @ApplicationContext context: Context,
+    ): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "appDatabase")
             .build()
     }

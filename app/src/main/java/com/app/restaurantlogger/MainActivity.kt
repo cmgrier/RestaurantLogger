@@ -1,38 +1,35 @@
 package com.app.restaurantlogger
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.app.restaurantlogger.database.AppDatabase
-import com.app.restaurantlogger.database.ReviewDao
-import com.app.restaurantlogger.home.mvi.HomeScreen
-import com.app.restaurantlogger.home.mvi.HomeViewModel
-import com.app.restaurantlogger.home.mvi.homeScreen
-import com.app.restaurantlogger.log.mvi.LogScreen
-import com.app.restaurantlogger.log.mvi.LogViewModel
-import com.app.restaurantlogger.log.mvi.logScreen
-import com.app.restaurantlogger.mvi.BaseIntent
-import com.app.restaurantlogger.mvi.BaseState
 import com.app.restaurantlogger.mvi.BaseViewModel
-import com.app.restaurantlogger.ui.enterZoomLeft
-import com.app.restaurantlogger.ui.enterZoomRight
-import com.app.restaurantlogger.ui.exitZoomLeft
-import com.app.restaurantlogger.ui.exitZoomRight
+import com.app.restaurantlogger.screens.home.mvi.HomeViewModel
+import com.app.restaurantlogger.screens.home.ui.homeScreen
+import com.app.restaurantlogger.screens.log.mvi.LogViewModel
+import com.app.restaurantlogger.screens.log.ui.logScreen
+import com.app.restaurantlogger.screens.settings.mvi.SettingsViewModel
+import com.app.restaurantlogger.screens.settings.ui.settingsScreen
+import com.app.restaurantlogger.ui.BottomBar
+import com.app.restaurantlogger.ui.TopBar
 import com.app.restaurantlogger.ui.theme.RestaurantLoggerTheme
+import com.app.restaurantlogger.ui.topBarHeight
 import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,15 +37,31 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val homeViewModel: HomeViewModel by viewModels()
     private val logViewModel: LogViewModel by viewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            RestaurantLoggerTheme {
+            val preferences =
+                LocalContext.current.getSharedPreferences(
+                    PREFERENCES_FILE_NAME,
+                    Context.MODE_PRIVATE,
+                )
+            RestaurantLoggerTheme(
+                darkTheme =
+                    preferences.getBoolean(
+                        SettingNames.IsDarkTheme.name,
+                        isSystemInDarkTheme(),
+                    ),
+            ) {
                 RestaurantLoggerApp(
-                    viewModels = listOf(
-                        homeViewModel,
-                        logViewModel,
-                    )
+                    preferences = preferences,
+                    viewModels =
+                        listOf(
+                            homeViewModel,
+                            logViewModel,
+                            settingsViewModel,
+                        ),
                 )
             }
         }
@@ -56,35 +69,41 @@ class MainActivity : ComponentActivity() {
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun RestaurantLoggerApp(
+    viewModels: List<BaseViewModel<*, *>>,
+    preferences: SharedPreferences?,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberAnimatedNavController(),
-    viewModels: List<BaseViewModel<*,*>>,
 ) {
     // Get current back stack entry
     val backStackEntry by navController.currentBackStackEntryAsState()
     // Get the name of the current screen
-    val currentScreen = AppScreen.valueOf(
-        backStackEntry?.destination?.route?.substringBefore("/") ?: AppScreen.Home.name
-    )
+    val currentScreen =
+        AppScreen.valueOf(
+            backStackEntry?.destination?.route?.substringBefore("/") ?: InitialAppScreen.name,
+        )
 
     val currentViewModel = viewModels.getViewModel(currentScreen)
 
-    Scaffold (
+    Scaffold(
         modifier = modifier.fillMaxSize(),
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = currentViewModel.floatingActionButtonAction,
-            ) {
-                currentViewModel.floatingActionButton()
-            }
+        topBar = {
+            TopBar(currentViewModel = currentViewModel, navHostController = navController)
         },
-        topBar = currentViewModel.topBar,
-    ){
+        bottomBar = {
+            BottomBar(
+                currentViewModel = currentViewModel,
+                navHostController = navController,
+            )
+        },
+    ) {
         AnimatedNavHost(
-            modifier = Modifier.fillMaxSize(),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(top = topBarHeight),
             navController = navController,
             startDestination = AppScreen.Home.name,
         ) {
@@ -94,16 +113,21 @@ fun RestaurantLoggerApp(
             )
             logScreen(
                 logViewModel = viewModels.getViewModel(AppScreen.Log) as LogViewModel,
-                navController = navController,
+            )
+            settingsScreen(
+                settingsViewModel = viewModels.getViewModel(AppScreen.Settings) as SettingsViewModel,
             )
         }
     }
-
 }
 
-fun List<BaseViewModel<*,*>>.getViewModel(appScreen: AppScreen) = this.first { it.appScreen == appScreen }
+fun List<BaseViewModel<*, *>>.getViewModel(appScreen: AppScreen) = this.first { it.appScreen == appScreen }
 
 enum class AppScreen {
     Home,
     Log,
+    Settings,
+    Info,
 }
+
+val InitialAppScreen = AppScreen.Home
