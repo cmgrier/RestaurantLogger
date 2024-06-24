@@ -6,20 +6,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.app.restaurantlogger.ui.TextButton
 
 @Composable
-fun NoReviewsItem(modifier: Modifier) {
+fun NoReviewsItem(
+    modifier: Modifier,
+    onClick: () -> Unit,
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = "No Reviews Found",
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.headlineSmall,
         )
-        Text(
-            text = "+ Add Review",
-            style = MaterialTheme.typography.bodyLarge,
-        )
+        TextButton(text = "+ Add Review", onClick = onClick)
     }
 }

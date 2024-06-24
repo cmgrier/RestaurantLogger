@@ -5,6 +5,8 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.ui.unit.IntOffset
@@ -16,20 +18,34 @@ private val scaleSpeed: FiniteAnimationSpec<Float> = tween(600)
 
 private val scaleAmount = .85f
 
+private val fadeSpeed: FiniteAnimationSpec<Float> = tween(500)
+
 val enterSlideLeft: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
-    slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = slideSpeed)
+    slideIntoContainer(
+        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+        animationSpec = slideSpeed,
+    )
 }
 
 val enterSlideRight: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
-    slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = slideSpeed)
+    slideIntoContainer(
+        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+        animationSpec = slideSpeed,
+    )
 }
 
 val exitSlideLeft: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
-    slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = slideSpeed)
+    slideOutOfContainer(
+        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+        animationSpec = slideSpeed,
+    )
 }
 
 val exitSlideRight: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
-    slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = slideSpeed)
+    slideOutOfContainer(
+        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+        animationSpec = slideSpeed,
+    )
 }
 
 val enterScaleIn: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
@@ -38,6 +54,14 @@ val enterScaleIn: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterT
 
 val exitScaleOut: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
     scaleOut(animationSpec = scaleSpeed, targetScale = scaleAmount)
+}
+
+val enterFadeIn: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+    fadeIn(animationSpec = fadeSpeed)
+}
+
+val exitFadeOut: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+    fadeOut(animationSpec = fadeSpeed)
 }
 
 val enterZoomLeft: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
@@ -54,4 +78,12 @@ val exitZoomLeft: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTr
 
 val exitZoomRight: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
     exitSlideRight() + exitScaleOut()
+}
+
+val enterShimmer: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+    enterFadeIn() + enterScaleIn()
+}
+
+val exitShimmer: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+    fadeOut() + exitScaleOut()
 }

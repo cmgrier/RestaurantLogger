@@ -41,7 +41,7 @@ class HomeViewModel
             get() = state.value.homeData
 
         override val floatingActionButtonAction: () -> Unit
-            get() = { showAddPlaceSheet() }
+            get() = { showPlaceSheet() }
         override val floatingActionButton: @Composable () -> Unit
             get() = {
                 FloatingActionButtonContent(title = "+ Add Place")
@@ -67,6 +67,14 @@ class HomeViewModel
             )
         }
 
+        fun updatePlace(place: Place) {
+            thread {
+                sendEvent(HomeIntent.LoadingData)
+                appDatabase.placeDao().update(place = place)
+                resetScreen()
+            }
+        }
+
         fun addPlace(simplePlace: SimplePlace) {
             val uid = simplePlace.hashCode()
             val newPlace = simplePlace.toPlace(uid)
@@ -77,8 +85,8 @@ class HomeViewModel
             }
         }
 
-        fun showAddPlaceSheet() {
-            sendEvent(HomeIntent.UpdateData(data = state.value.homeData.copy(showAddPlaceSheet = true)))
+        fun showPlaceSheet() {
+            sendEvent(HomeIntent.UpdateData(data = state.value.homeData.copy(showPlaceSheet = true)))
         }
 
         fun hideAddPlaceSheet() {
@@ -86,7 +94,7 @@ class HomeViewModel
                 HomeIntent.UpdateData(
                     data =
                         state.value.homeData.copy(
-                            showAddPlaceSheet = false,
+                            showPlaceSheet = false,
                         ),
                 ),
             )

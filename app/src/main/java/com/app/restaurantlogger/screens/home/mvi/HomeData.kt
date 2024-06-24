@@ -10,7 +10,7 @@ data class HomeData(
     val restaurants: List<Restaurant>,
     val sortMethod: SortMethod,
     val selectedFilters: Filters,
-    val showAddPlaceSheet: Boolean,
+    val showPlaceSheet: Boolean,
     val showSortSheet: Boolean,
     val showFilterSheet: Boolean,
 ) : BaseData {
@@ -19,7 +19,7 @@ data class HomeData(
             HomeData(
                 restaurants = emptyList(),
                 sortMethod = SortMethod.Name,
-                showAddPlaceSheet = false,
+                showPlaceSheet = false,
                 showSortSheet = false,
                 showFilterSheet = false,
                 selectedFilters =

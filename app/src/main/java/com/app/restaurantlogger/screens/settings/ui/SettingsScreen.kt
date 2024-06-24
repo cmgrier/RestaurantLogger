@@ -1,7 +1,6 @@
 package com.app.restaurantlogger.screens.settings.ui
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
@@ -19,24 +18,26 @@ import androidx.navigation.NavGraphBuilder
 import com.app.restaurantlogger.AppScreen
 import com.app.restaurantlogger.PREFERENCES_FILE_NAME
 import com.app.restaurantlogger.screens.settings.mvi.SettingsViewModel
-import com.app.restaurantlogger.ui.enterZoomLeft
-import com.app.restaurantlogger.ui.exitZoomLeft
-import com.app.restaurantlogger.ui.exitZoomRight
+import com.app.restaurantlogger.ui.enterShimmer
+import com.app.restaurantlogger.ui.exitShimmer
 import com.app.restaurantlogger.ui.theme.LocalEdgePadding
 import com.google.accompanist.navigation.animation.composable
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.settingsScreen(settingsViewModel: SettingsViewModel) {
+fun NavGraphBuilder.settingsScreen(
+    settingsViewModel: SettingsViewModel,
+    onThemeChange: (Boolean) -> Unit,
+) {
     composable(
         route = AppScreen.Settings.name,
         enterTransition = {
-            enterZoomLeft()
+            enterShimmer()
         },
         exitTransition = {
-            exitZoomLeft()
+            exitShimmer()
         },
         popExitTransition = {
-            exitZoomRight()
+            exitShimmer()
         },
     ) {
         settingsViewModel.refreshState(
@@ -47,12 +48,16 @@ fun NavGraphBuilder.settingsScreen(settingsViewModel: SettingsViewModel) {
         )
         SettingsScreen(
             settingsViewModel = settingsViewModel,
+            onThemeChange = onThemeChange,
         )
     }
 }
 
 @Composable
-fun SettingsScreen(settingsViewModel: SettingsViewModel) {
+fun SettingsScreen(
+    settingsViewModel: SettingsViewModel,
+    onThemeChange: (Boolean) -> Unit,
+) {
     val state by settingsViewModel.state.collectAsState()
     val context = LocalContext.current
     LazyColumn(
@@ -77,12 +82,13 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
                                 ),
                             preferences = it,
                         )
+                        onThemeChange(newState)
                     }
-                    Toast.makeText(
-                        context,
-                        "Restart the app for the changes to take effect",
-                        Toast.LENGTH_SHORT,
-                    ).show()
+//                    Toast.makeText(
+//                        context,
+//                        "Restart the app for the changes to take effect",
+//                        Toast.LENGTH_SHORT,
+//                    ).show()
                 },
             )
         }

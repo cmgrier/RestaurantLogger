@@ -26,7 +26,7 @@ fun PlacesHeader(
                     .clickable { onSortClick() },
             text = "Sort",
             textDecoration = TextDecoration.Underline,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
         )
         Text(
             modifier =
@@ -36,7 +36,7 @@ fun PlacesHeader(
                     .clickable { onFilterClick() },
             text = "Filter",
             textDecoration = TextDecoration.Underline,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
         )
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import com.app.restaurantlogger.R
@@ -16,6 +17,7 @@ fun StarRow(
     modifier: Modifier = Modifier,
     starCount: Float,
     starSize: IconSize = IconSize.Medium,
+    color: Color = MaterialTheme.colorScheme.primary,
 ) {
     val starIconFull = painterResource(id = R.drawable.round_star_24)
     val starIconHalf = painterResource(id = R.drawable.round_star_half_24)
@@ -28,6 +30,7 @@ fun StarRow(
                 painter = starIconFull,
                 contentDescription = "full review star",
                 starSize = starSize,
+                color = color,
             )
         }
         val hasHalfStar = starCount - filledStars.toFloat() > 0.25f
@@ -36,6 +39,7 @@ fun StarRow(
                 painter = starIconHalf,
                 contentDescription = "half review star",
                 starSize = starSize,
+                color = color,
             )
         }
         val emptyStars = 5 - filledStars - if (hasHalfStar) 1 else 0
@@ -44,6 +48,7 @@ fun StarRow(
                 painter = starIconEmpty,
                 contentDescription = "empty review star",
                 starSize = starSize,
+                color = color,
             )
         }
     }
@@ -55,13 +60,12 @@ private fun StarIcon(
     contentDescription: String,
     starSize: IconSize,
     modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.primary,
 ) {
-    val starColor = MaterialTheme.colorScheme.primary
-
     Icon(
         painter = painter,
         contentDescription = contentDescription,
-        tint = starColor,
+        tint = color,
         modifier = modifier.size(starSize.size),
     )
 }

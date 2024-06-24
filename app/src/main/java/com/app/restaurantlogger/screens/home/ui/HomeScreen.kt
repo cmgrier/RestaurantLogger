@@ -14,6 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,10 +25,11 @@ import androidx.navigation.NavHostController
 import com.app.restaurantlogger.AppScreen
 import com.app.restaurantlogger.dataModel.filter
 import com.app.restaurantlogger.dataModel.sort
+import com.app.restaurantlogger.database.Place
 import com.app.restaurantlogger.screens.home.mvi.HomeViewModel
-import com.app.restaurantlogger.ui.enterZoomLeft
-import com.app.restaurantlogger.ui.enterZoomRight
-import com.app.restaurantlogger.ui.exitZoomLeft
+import com.app.restaurantlogger.ui.enterShimmer
+import com.app.restaurantlogger.ui.exitShimmer
+import com.app.restaurantlogger.ui.exitSlideLeft
 import com.app.restaurantlogger.ui.theme.LocalEdgePadding
 import com.google.accompanist.navigation.animation.composable
 
@@ -37,13 +41,16 @@ fun NavGraphBuilder.homeScreen(
     composable(
         route = AppScreen.Home.name,
         enterTransition = {
-            enterZoomLeft()
+            enterShimmer()
         },
         exitTransition = {
-            exitZoomLeft()
+            exitShimmer() + exitSlideLeft()
         },
         popEnterTransition = {
-            enterZoomRight()
+            enterShimmer()
+        },
+        popExitTransition = {
+            exitShimmer()
         },
     ) {
         HomeScreen(
@@ -61,6 +68,10 @@ fun HomeScreen(
     val state by homeViewModel.state.collectAsState()
 
     val places = state.homeData.restaurants
+
+    var selectedPlace by remember {
+        mutableStateOf<Place?>(null)
+    }
 
     if (places.isNotEmpty()) {
         LazyColumn(
@@ -86,6 +97,10 @@ fun HomeScreen(
                             route = "${AppScreen.Log.name}/${restaurant.place.uid}",
                         )
                     },
+                    onLongCardClick = {
+                        selectedPlace = restaurant.place
+                        homeViewModel.showPlaceSheet()
+                    },
                 )
             }
         }
@@ -95,17 +110,33 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(text = "No Restaurants Reviewed")
-            Button(onClick = { homeViewModel.showAddPlaceSheet() }) {
+            Button(onClick = { homeViewModel.showPlaceSheet() }) {
                 Text(text = "Add Restaurant")
             }
         }
     }
 
-    AddPlaceSheet(
+    PlaceSheet(
         modifier = Modifier,
-        showSheet = state.homeData.showAddPlaceSheet,
-        onDismissRequest = { homeViewModel.hideAddPlaceSheet() },
-        onSubmitRequest = { homeViewModel.addPlace(it) },
+        showSheet = state.homeData.showPlaceSheet,
+        onDismissRequest = {
+            homeViewModel.hideAddPlaceSheet()
+            selectedPlace = null
+        },
+        onSubmitRequest = { newPlace ->
+            selectedPlace?.let {
+                homeViewModel.updatePlace(
+                    it.copy(
+                        name = newPlace.name,
+                        address = newPlace.address,
+                        cuisine = newPlace.cuisine,
+                    ),
+                )
+            } ?: run {
+                homeViewModel.addPlace(newPlace)
+            }
+        },
+        initialPlace = selectedPlace,
     )
 
     SortSheet(

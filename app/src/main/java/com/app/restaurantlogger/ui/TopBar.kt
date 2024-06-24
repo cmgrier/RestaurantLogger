@@ -41,7 +41,7 @@ fun TopBar(
             modifier =
                 modifier
                     .fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.primary)
+                    .background(color = MaterialTheme.colorScheme.primaryContainer)
                     .height(topBarHeight),
             verticalArrangement = Arrangement.Bottom,
         ) {
@@ -88,7 +88,7 @@ fun TopBarHeader(
                 },
             text = header,
             style = MaterialTheme.typography.displayMedium,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
         )
     }
 }

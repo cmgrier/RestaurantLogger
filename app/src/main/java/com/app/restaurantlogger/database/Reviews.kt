@@ -7,6 +7,7 @@ import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 
 @Entity
 data class Review(
@@ -15,6 +16,7 @@ data class Review(
     @ColumnInfo(name = "rating") override val rating: Float?,
     @ColumnInfo(name = "headline") override val headline: String,
     @ColumnInfo(name = "details") override val details: String?,
+    @ColumnInfo(name = "date") override val date: String?,
 ) : SimpleReview
 
 interface SimpleReview {
@@ -22,6 +24,7 @@ interface SimpleReview {
     val rating: Float?
     val headline: String
     val details: String?
+    val date: String?
 }
 
 data class DataReview(
@@ -29,6 +32,7 @@ data class DataReview(
     override val headline: String,
     override val details: String?,
     override val rating: Float?,
+    override val date: String?,
 ) : SimpleReview
 
 fun nearestHalfRating(rating: Float): Float {
@@ -59,6 +63,9 @@ interface ReviewDao {
     @Insert
     fun insertAll(vararg reviews: Review)
 
+    @Update
+    fun update(review: Review)
+
     @Delete
     fun delete(review: Review)
 }
@@ -70,6 +77,7 @@ val sampleReview0 =
         rating = 3.5f,
         headline = "Best Meatball's in town!",
         details = "The chicken parm was a soggy, but the meatballs were so good and fresh!",
+        date = "11/11/11",
     )
 
 val sampleReview1 =
@@ -79,6 +87,7 @@ val sampleReview1 =
         rating = 2.0f,
         headline = "Server was rude",
         details = "Took forever to get seated and we barely saw our server. Food was cold when we got it",
+        date = "11/11/11",
     )
 
 val sampleReview2 =
@@ -88,6 +97,7 @@ val sampleReview2 =
         rating = 5.0f,
         headline = "Mashed Potatoes to die for",
         details = "perfect roast chicken dinner with the best mashed potatoes ever. Also great cocktails!",
+        date = "11/11/11",
     )
 
 val sampleReviewList =

@@ -93,6 +93,7 @@ class LogViewModel
                 headline = simpleReview.headline,
                 details = simpleReview.details,
                 rating = simpleReview.rating,
+                date = simpleReview.date,
             )
         }
 
@@ -100,6 +101,7 @@ class LogViewModel
             headline: String,
             details: String? = null,
             rating: Float? = null,
+            date: String? = null,
         ) {
             state.value.logData.placeId?.let { placeId ->
                 val uid =
@@ -108,6 +110,7 @@ class LogViewModel
                         rating = rating,
                         headline = headline,
                         details = details,
+                        date = date,
                     ).hashCode()
 
                 val review =
@@ -117,6 +120,7 @@ class LogViewModel
                         rating = rating,
                         headline = headline,
                         details = details,
+                        date = date,
                     )
 
                 thread {
@@ -127,12 +131,21 @@ class LogViewModel
             }
         }
 
+        fun updateReview(review: Review) {
+            thread {
+                sendEvent(LogIntent.LoadingData)
+                appDatabase.reviewDao().update(review)
+                resetScreen()
+                sendEvent(LogIntent.LoadingData)
+            }
+        }
+
         fun showSheet() {
-            sendEvent(LogIntent.ShowNewLogSheet)
+            sendEvent(LogIntent.ShowLogSheet)
         }
 
         fun hideSheet() {
-            sendEvent(LogIntent.HideNewLogSheet)
+            sendEvent(LogIntent.HideLogSheet)
         }
 
         private fun sendEvent(event: LogIntent) {
@@ -161,12 +174,12 @@ class LogViewModel
                         setState(oldState.copy(fetchStatus = FetchStatus.Fetched, logData = event.data))
                     }
 
-                    is LogIntent.ShowNewLogSheet -> {
-                        setState(oldState.copy(showNewLogSheet = true))
+                    is LogIntent.ShowLogSheet -> {
+                        setState(oldState.copy(showLogSheet = true))
                     }
 
-                    is LogIntent.HideNewLogSheet -> {
-                        setState(oldState.copy(showNewLogSheet = false))
+                    is LogIntent.HideLogSheet -> {
+                        setState(oldState.copy(showLogSheet = false))
                     }
                 }
             }

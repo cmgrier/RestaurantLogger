@@ -2,7 +2,6 @@ package com.app.restaurantlogger
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -47,21 +49,28 @@ class MainActivity : ComponentActivity() {
                     PREFERENCES_FILE_NAME,
                     Context.MODE_PRIVATE,
                 )
+
+            val initialTheme =
+                preferences.getBoolean(
+                    SettingNames.IsDarkTheme.name,
+                    isSystemInDarkTheme(),
+                )
+
+            var isDarkTheme by remember {
+                mutableStateOf(initialTheme)
+            }
+
             RestaurantLoggerTheme(
-                darkTheme =
-                    preferences.getBoolean(
-                        SettingNames.IsDarkTheme.name,
-                        isSystemInDarkTheme(),
-                    ),
+                darkTheme = isDarkTheme,
             ) {
                 RestaurantLoggerApp(
-                    preferences = preferences,
                     viewModels =
                         listOf(
                             homeViewModel,
                             logViewModel,
                             settingsViewModel,
                         ),
+                    onThemeChange = { newState -> isDarkTheme = newState },
                 )
             }
         }
@@ -73,7 +82,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun RestaurantLoggerApp(
     viewModels: List<BaseViewModel<*, *>>,
-    preferences: SharedPreferences?,
+    onThemeChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberAnimatedNavController(),
 ) {
@@ -116,6 +125,7 @@ fun RestaurantLoggerApp(
             )
             settingsScreen(
                 settingsViewModel = viewModels.getViewModel(AppScreen.Settings) as SettingsViewModel,
+                onThemeChange = onThemeChange,
             )
         }
     }

@@ -1,9 +1,13 @@
 package com.app.restaurantlogger.screens.log.ui
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,14 +15,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.app.restaurantlogger.database.Review
 import com.app.restaurantlogger.database.sampleReview0
 import com.app.restaurantlogger.ui.reviewstars.StarRow
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LogCard(
     modifier: Modifier = Modifier,
     review: Review = sampleReview0,
+    onLongClick: (Review) -> Unit,
 ) {
     val isExpanded =
         remember {
@@ -27,10 +34,21 @@ fun LogCard(
     Box(
         modifier =
             modifier
+                .background(
+                    MaterialTheme.colorScheme.secondaryContainer,
+                    shape = MaterialTheme.shapes.medium,
+                )
+                .border(
+                    width = 2.dp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    shape = MaterialTheme.shapes.medium,
+                )
+                .padding(vertical = 8.dp, horizontal = 16.dp)
                 .fillMaxWidth()
-                .clickable(
-                    enabled = review.details != null,
-                ) { isExpanded.value = !isExpanded.value },
+                .combinedClickable(
+                    onClick = { if (review.details != null) isExpanded.value = !isExpanded.value },
+                    onLongClick = { onLongClick(review) },
+                ),
     ) {
         CardContent(
             review = review,
@@ -45,8 +63,18 @@ private fun CardContent(
     isExpanded: Boolean,
 ) {
     Column {
-        // Rating
-        review.rating?.let { StarRow(starCount = it) }
+        Box(modifier = Modifier.fillMaxWidth()) {
+            // Rating
+            review.rating?.let {
+                StarRow(
+                    starCount = it,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier,
+                )
+            }
+            // Date
+            review.date?.let { Text(text = it) }
+        }
 
         // Headline
         val headlineTextStyle = MaterialTheme.typography.headlineMedium

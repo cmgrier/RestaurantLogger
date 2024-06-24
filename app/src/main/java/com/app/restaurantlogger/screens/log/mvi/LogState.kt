@@ -8,14 +8,14 @@ import javax.annotation.concurrent.Immutable
 data class LogState(
     override val fetchStatus: FetchStatus,
     val logData: LogData,
-    val showNewLogSheet: Boolean,
+    val showLogSheet: Boolean,
 ) : BaseState {
     companion object {
         fun initial() =
             LogState(
                 fetchStatus = FetchStatus.NotFetched,
                 logData = LogData.initial(),
-                showNewLogSheet = false,
+                showLogSheet = false,
             )
     }
 }

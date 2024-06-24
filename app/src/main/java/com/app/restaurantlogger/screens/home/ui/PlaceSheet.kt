@@ -9,30 +9,38 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.app.restaurantlogger.database.DataPlace
+import com.app.restaurantlogger.database.Place
 import com.app.restaurantlogger.database.SimplePlace
+import com.app.restaurantlogger.ui.StyledTextField
 import com.app.restaurantlogger.ui.theme.LocalEdgePadding
 import com.app.restaurantlogger.ui.theme.LocalSheetBottomPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPlaceSheet(
-    modifier: Modifier,
+fun PlaceSheet(
     showSheet: Boolean,
     onDismissRequest: () -> Unit,
     onSubmitRequest: (SimplePlace) -> Unit,
+    modifier: Modifier = Modifier,
+    initialPlace: Place? = null,
 ) {
-    val sheetState = rememberModalBottomSheetState()
     if (showSheet) {
+        val sheetState = rememberModalBottomSheetState()
+        var name by remember { mutableStateOf(initialPlace?.name.orEmpty()) }
+        var cuisine by remember { mutableStateOf(initialPlace?.cuisine.orEmpty()) }
+        var address by remember { mutableStateOf(initialPlace?.address.orEmpty()) }
+        val place = DataPlace(name = name, cuisine = cuisine, address = address)
+
         ModalBottomSheet(
             modifier = modifier,
             sheetState = sheetState,
@@ -47,33 +55,28 @@ fun AddPlaceSheet(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                val name = remember { mutableStateOf("") }
                 StyledTextField(
-                    value = name.value,
-                    onValueChange = { name.value = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    value = name,
+                    onValueChange = { name = it },
                     placeholder = "Name",
+                    textStyle = MaterialTheme.typography.headlineSmall,
                 )
 
-                val cuisine = remember { mutableStateOf("") }
                 StyledTextField(
-                    value = cuisine.value,
-                    onValueChange = { cuisine.value = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    value = cuisine,
+                    onValueChange = { cuisine = it },
                     placeholder = "Cuisine",
                 )
 
-                val address = remember { mutableStateOf("") }
                 StyledTextField(
-                    value = address.value,
-                    onValueChange = { address.value = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    value = address,
+                    onValueChange = { address = it },
                     placeholder = "Google Maps Link",
                 )
 
-                val place =
-                    DataPlace(
-                        name = name.value,
-                        address = address.value,
-                        cuisine = cuisine.value,
-                    )
                 Button(
                     enabled = place.isValid(),
                     onClick = {
@@ -91,28 +94,4 @@ fun AddPlaceSheet(
     }
 }
 
-@Composable
-fun StyledTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String? = null,
-) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = {
-            placeholder?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        },
-        colors =
-            TextFieldDefaults.colors().copy(
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-            ),
-    )
-}
-
-fun DataPlace.isValid(): Boolean = this.name.isNotEmpty()
+fun SimplePlace.isValid(): Boolean = this.name.isNotEmpty()

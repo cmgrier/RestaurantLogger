@@ -7,7 +7,7 @@ sealed class LogIntent : BaseIntent {
 
     data class UpdateData(val data: LogData) : LogIntent()
 
-    object ShowNewLogSheet : LogIntent()
+    object ShowLogSheet : LogIntent()
 
-    object HideNewLogSheet : LogIntent()
+    object HideLogSheet : LogIntent()
 }
