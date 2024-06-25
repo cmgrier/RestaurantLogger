@@ -44,7 +44,7 @@ class HomeViewModel
             get() = { showPlaceSheet() }
         override val floatingActionButton: @Composable () -> Unit
             get() = {
-                FloatingActionButtonContent(title = "+ Add Place")
+                FloatingActionButtonContent(title = " + Add Place ")
             }
         override val topBarContent: @Composable (NavHostController, Modifier) -> Unit
             get() = { _, modifier ->

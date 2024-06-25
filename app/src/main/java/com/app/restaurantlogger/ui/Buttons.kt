@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.app.restaurantlogger.R
@@ -59,6 +60,7 @@ fun TextButton(
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
+            textDecoration = TextDecoration.Underline,
         )
     }
 }

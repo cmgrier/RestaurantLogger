@@ -2,12 +2,15 @@ package com.app.restaurantlogger.screens.log.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -71,30 +74,35 @@ fun LogScreen(viewModel: LogViewModel) {
         mutableStateOf<Review?>(null)
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = LocalEdgePadding.current),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        val items = restaurant?.reviews.orEmpty()
-        item { Spacer(modifier = Modifier.height(8.dp)) }
-        itemsIndexed(
-            items = items,
-        ) { index, item ->
-            LogCard(
-                review = item,
-                onLongClick = { review ->
-                    selectedReview = review
-                    viewModel.showSheet()
-                },
-            )
-        }
-        if (items.isEmpty()) {
-            item {
-                NoReviewsItem(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    onClick = { viewModel.showSheet() },
+    val items = restaurant?.reviews.orEmpty()
+
+    if (items.isNotEmpty()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = LocalEdgePadding.current),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            item { Spacer(modifier = Modifier.height(8.dp)) }
+            itemsIndexed(
+                items = items,
+            ) { index, item ->
+                LogCard(
+                    review = item,
+                    onLongClick = { review ->
+                        selectedReview = review
+                        viewModel.showSheet()
+                    },
                 )
+            }
+        }
+    } else {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(text = "No Reviews Yet...")
+            Button(onClick = { viewModel.showSheet() }) {
+                Text(text = "+ Add Review")
             }
         }
     }

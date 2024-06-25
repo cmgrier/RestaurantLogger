@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.app.restaurantlogger.ui.TopBarHeader
+import com.app.restaurantlogger.ui.theme.LocalEdgePadding
 
 @Composable
 fun PlacesHeader(
@@ -31,7 +32,7 @@ fun PlacesHeader(
         Text(
             modifier =
                 Modifier
-                    .padding(start = 8.dp)
+                    .padding(start = 12.dp, end = LocalEdgePadding.current)
                     .alignByBaseline()
                     .clickable { onFilterClick() },
             text = "Filter",

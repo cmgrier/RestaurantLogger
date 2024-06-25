@@ -45,7 +45,7 @@ class LogViewModel
 
         override val floatingActionButton: @Composable () -> Unit
             get() = {
-                FloatingActionButtonContent("+ Add Review")
+                FloatingActionButtonContent(" + Add Review ")
             }
         override val topBarContent: @Composable (NavHostController, Modifier) -> Unit
             get() = { navHostController, modifier ->
