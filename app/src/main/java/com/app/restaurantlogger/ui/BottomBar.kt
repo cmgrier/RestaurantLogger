@@ -1,13 +1,10 @@
 package com.app.restaurantlogger.ui
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.FloatingActionButton
@@ -21,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.app.restaurantlogger.AppScreen
 import com.app.restaurantlogger.mvi.BaseViewModel
-import com.app.restaurantlogger.ui.theme.LocalEdgePadding
 import com.app.restaurantlogger.util.IconSize
 
 @Composable
@@ -58,22 +54,24 @@ fun BottomBar(
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }
-                IconButton(
-                    onClick = { /*TODO*/ },
-                ) {
-                    val infoIcon =
-                        if (currentViewModel.appScreen == AppScreen.Info) {
-                            Icons.Filled.Info
-                        } else {
-                            Icons.Outlined.Info
-                        }
-                    Icon(
-                        modifier = Modifier.size(IconSize.Large.size),
-                        imageVector = infoIcon,
-                        contentDescription = "Info",
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                }
+                /**
+                 IconButton(
+                 onClick = { /*TODO*/ },
+                 ) {
+                 val infoIcon =
+                 if (currentViewModel.appScreen == AppScreen.Info) {
+                 Icons.Filled.Info
+                 } else {
+                 Icons.Outlined.Info
+                 }
+                 Icon(
+                 modifier = Modifier.size(IconSize.Large.size),
+                 imageVector = infoIcon,
+                 contentDescription = "Info",
+                 tint = MaterialTheme.colorScheme.primary,
+                 )
+                 }
+                 */
             },
             floatingActionButton = {
                 FloatingActionButton(

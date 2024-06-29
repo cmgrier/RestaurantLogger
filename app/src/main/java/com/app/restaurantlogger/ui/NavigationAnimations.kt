@@ -14,7 +14,7 @@ import androidx.navigation.NavBackStackEntry
 
 private val slideSpeed: FiniteAnimationSpec<IntOffset> = tween(500)
 
-private val scaleSpeed: FiniteAnimationSpec<Float> = tween(600)
+private val scaleSpeed: FiniteAnimationSpec<Float> = tween(400)
 
 private val scaleAmount = .85f
 
