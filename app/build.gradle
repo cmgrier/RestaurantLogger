@@ -13,8 +13,11 @@ android {
         applicationId "com.app.restaurantlogger"
         minSdk 24
         targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "Initial Release"
+
+        buildConfigField("String", "FOUR_SQUARE_PLACES_API_KEY", "\"${FOUR_SQUARE_PLACES_API_KEY}\"")
+        buildConfigField("String", "GOOGLE_PLACES_API_KEY", "\"${GOOGLE_PLACES_API_KEY}\"")
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -89,4 +92,8 @@ dependencies {
 
     // optional - Paging 3 Integration
     implementation "androidx.room:room-paging:$room_version"
+
+    // Places
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:$kotlin_version"))
+    implementation 'com.google.android.libraries.places:places:3.5.0'
 }

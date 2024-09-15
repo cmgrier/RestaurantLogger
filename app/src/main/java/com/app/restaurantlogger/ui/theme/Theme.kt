@@ -1,38 +1,25 @@
 package com.app.restaurantlogger.ui.theme
 
-import android.os.Build
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalContext
-
-private val DarkColorPalette = darkColorScheme()
-
-private val LightColorPalette = lightColorScheme()
+import androidx.compose.ui.res.colorResource
+import com.app.restaurantlogger.R
 
 @Composable
 fun RestaurantLoggerTheme(
     darkTheme: Boolean,
     content: @Composable () -> Unit,
 ) {
-    val context = LocalContext.current
-    val colors = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    val colors =
         if (darkTheme) {
-            dynamicDarkColorScheme(context = context)
+            appDarkTheme()
         } else {
-            dynamicLightColorScheme(context = context)
+            appLightTheme()
         }
-    } else {
-        if (darkTheme) {
-            DarkColorPalette
-        } else {
-            LightColorPalette
-        }
-    }
 
     CompositionLocalProvider(
         LocalEdgePadding provides defaultEdgeSpacing,
@@ -46,3 +33,37 @@ fun RestaurantLoggerTheme(
         )
     }
 }
+
+@Composable
+fun appDarkTheme(): ColorScheme =
+    darkColorScheme(
+        primary = colorResource(id = R.color.dark_primary_color),
+        onPrimary = colorResource(id = R.color.dark_on_primary),
+        primaryContainer = colorResource(id = R.color.dark_primary_variant),
+        secondary = colorResource(id = R.color.dark_secondary),
+        onSecondary = colorResource(id = R.color.dark_on_secondary),
+        secondaryContainer = colorResource(id = R.color.dark_secondary_variant),
+        background = colorResource(id = R.color.dark_background),
+        onBackground = colorResource(id = R.color.dark_on_background),
+        surface = colorResource(id = R.color.dark_surface),
+        onSurface = colorResource(id = R.color.dark_on_surface),
+        error = colorResource(id = R.color.dark_error),
+        onError = colorResource(id = R.color.dark_on_error),
+    )
+
+@Composable
+fun appLightTheme(): ColorScheme =
+    lightColorScheme(
+        primary = colorResource(id = R.color.light_primary_color),
+        onPrimary = colorResource(id = R.color.light_on_primary),
+        primaryContainer = colorResource(id = R.color.light_primary_variant),
+        secondary = colorResource(id = R.color.light_secondary),
+        onSecondary = colorResource(id = R.color.light_on_secondary),
+        secondaryContainer = colorResource(id = R.color.light_secondary_variant),
+        background = colorResource(id = R.color.light_background),
+        onBackground = colorResource(id = R.color.light_on_background),
+        surface = colorResource(id = R.color.light_surface),
+        onSurface = colorResource(id = R.color.light_on_surface),
+        error = colorResource(id = R.color.light_error),
+        onError = colorResource(id = R.color.light_on_error),
+    )
